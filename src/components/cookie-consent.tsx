@@ -1,3 +1,10 @@
+declare global {
+  interface Window {
+    fbq?: (...args: any[]) => void;
+    _fbq?: any;
+  }
+}
+
 import { useEffect, useState } from 'react';
 
 const COOKIE_KEY = 'cookie_consent';
@@ -8,13 +15,16 @@ export const CookieConsent = () => {
 
   useEffect(() => {
     const consent = localStorage.getItem(COOKIE_KEY);
-    if (!consent) setShowBanner(true);
-    // else if (consent === 'accepted') initFacebookPixel();
+    if (!consent) {
+      setShowBanner(true);
+    } else if (consent === 'accepted') {
+      initFacebookPixel();
+    }
   }, []);
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_KEY, 'accepted');
-    // initFacebookPixel();
+    initFacebookPixel();
     setShowBanner(false);
   };
 
@@ -23,36 +33,44 @@ export const CookieConsent = () => {
     setShowBanner(false);
   };
 
-  //   const initFacebookPixel = () => {
-  //     if (window.fbq) return;
+  const initFacebookPixel = () => {
+    if (window.fbq) return;
 
-  //     !(function (f: any, b, e, v, n?, t?, s?) {
-  //       if (f.fbq) return;
-  //       n = f.fbq = function () {
-  //         n.callMethod
-  //           ? n.callMethod.apply(n, arguments)
-  //           : n.queue.push(arguments);
-  //       };
-  //       if (!f._fbq) f._fbq = n;
-  //       n.push = n;
-  //       n.loaded = true;
-  //       n.version = '2.0';
-  //       n.queue = [];
-  //       t = b.createElement(e);
-  //       t.async = true;
-  //       t.src = v;
-  //       s = b.getElementsByTagName(e)[0];
-  //       s.parentNode.insertBefore(t, s);
-  //     })(
-  //       window,
-  //       document,
-  //       'script',
-  //       'https://connect.facebook.net/en_US/fbevents.js'
-  //     );
+    (function (
+      f: any,
+      b: Document,
+      e: string,
+      v: string,
+      n?: any,
+      t?: HTMLScriptElement,
+      s?: Node
+    ) {
+      if (f.fbq) return;
+      n = f.fbq = function (...args: any[]) {
+        n.callMethod ? n.callMethod(...args) : n.queue.push(args);
+      };
+      if (!f._fbq) f._fbq = n;
+      n.push = n;
+      n.loaded = true;
+      n.version = '2.0';
+      n.queue = [];
+      t = b.createElement(e) as HTMLScriptElement;
+      t.async = true;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode?.insertBefore(t, s);
+    })(
+      window,
+      document,
+      'script',
+      'https://connect.facebook.net/en_US/fbevents.js'
+    );
 
-  //     window.fbq('init', 'YOUR_PIXEL_ID');
-  //     window.fbq('track', 'PageView');
-  //   };
+    if (typeof window.fbq === 'function') {
+      (window.fbq as (...args: any[]) => void)('init', FACEBOOK_PIXEL_ID);
+      (window.fbq as (...args: any[]) => void)('track', 'PageView');
+    }
+  };
 
   if (!showBanner) return null;
 
