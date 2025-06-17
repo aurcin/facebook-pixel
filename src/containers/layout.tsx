@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 
 import Navbar from '../components/navbar';
+import { CookieConsent } from '../components/cookie-consent';
 
 function Layout() {
   return (
@@ -13,6 +14,7 @@ function Layout() {
       <main className='container mx-auto my-4'>
         <Outlet />
       </main>
+      <CookieConsent />
     </>
   );
 }

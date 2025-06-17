@@ -5,9 +5,7 @@ function AboutPage() {
       <p className='mt-2 text-neutral-800'>
         The button below is to trigger another custom event
       </p>
-      <button className='mt-8 px-4 py-2 text-neutral-100 rounded bg-neutral-900 cursor-pointer active:scale-95'>
-        Trigger Event 2
-      </button>
+      <button className='button button-primary mt-8'>Trigger Event 2</button>
     </>
   );
 }
